@@ -1,0 +1,73 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+
+        {
+            "name": "Debug meshgateway",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/meshgateway",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debuf ble_poc",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/ble_poc",
+            "args": [],
+            "stopAtEntry": false,
+            "cwd": "${fileDirname}",
+            "environment": [],
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                },
+                {
+                    "description": "Set Disassembly Flavor to Intel",
+                    "text": "-gdb-set disassembly-flavor intel",
+                    "ignoreFailures": true
+                }
+            ]
+        },
+        {
+            "name": "Debug CryptoTests",
+            "type": "cppdbg",
+            "request": "launch",
+            "program": "${workspaceFolder}/build/crypto_tests", // Path to your compiled binary
+            "args": [], // Command-line arguments if needed
+            "stopAtEntry": false,
+            "cwd": "${workspaceFolder}/build", // Working directory
+            "environment": [],
+            "externalConsole": false, // Use VSCode's internal terminal
+            "MIMode": "gdb", // Use gdb for debugging
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing",
+                    "ignoreFailures": true
+                }
+            ]
+        }
+    ]
+}

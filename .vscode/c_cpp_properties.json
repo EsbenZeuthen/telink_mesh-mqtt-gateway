@@ -1,0 +1,21 @@
+{
+    "configurations": [
+        {
+            "name": "Linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/src/crypto",
+                "/usr/include/giomm-2.4",
+                "/usr/include/glibmm-2.4",
+                "/usr/include",
+                "/usr/include/mqtt",
+                "/usr/include/jsoncpp"
+            ],
+            "defines": [],
+            "cStandard": "c17",
+            "cppStandard": "gnu++14",
+            "intelliSenseMode": "linux-gcc-x64"
+        }
+    ],
+    "version": 4
+}

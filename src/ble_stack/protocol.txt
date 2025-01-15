@@ -1,0 +1,237 @@
+        # Telink commands
+  def query_mesh_id(self, mesh_id=0xFFFF):
+      """
+      Query the mesh ID of devices in the Telink Mesh network.
+      
+      :param mesh_id: The mesh ID to query. Defaults to 0xFFFF (all devices).
+      """  
+      
+      print("Querying mesh ids")
+
+      # Send the packet using the COMMAND_ADDRESS_EDIT command
+      self.send_packet(mesh_id,COMMAND_ADDRESS_EDIT, [0xFF,0xFF])
+
+  def query_status(self, mesh_id=0xFFFF):
+      """
+      Query the status of devices in the Telink Mesh network.
+      
+      :param mesh_id: The mesh ID to query. Defaults to 0xFFFF (all devices).
+      """  
+      print("Querying status")
+      # Send the packet using the COMMAND_ADDRESS_EDIT command
+      self.send_packet(mesh_id, COMMAND_STATUS_QUERY, [0x10])
+
+
+  def set_light_state(self, mesh_id=0xFFFF, on_off=False):
+      """
+      Set the state of the Telink light to on or off.
+
+      :param mesh_id: The mesh ID of the device to control. Defaults to 0xFFFF (all devices).
+      :param on_off: Boolean indicating the desired state (True for on, False for off). Defaults to False (off).
+      """
+      print(f"Setting light state to {'on' if on_off else 'off'} for mesh ID {mesh_id}")
+
+      # Send the packet using the COMMAND_LIGHT_ON_OFF command
+      btle_client.send_packet(mesh_id, COMMAND_LIGHT_ON_OFF, [int(on_off), 0, 0])
+
+  def set_brightness(self, mesh_id, brightness):
+      """Set the brightness of the light."""
+      # Clamp brightness between 0 and 100
+      brightness = max(0, min(100, brightness))
+
+      # Send the packet using the appropriate command
+      print(f"Setting light {mesh_id} brightness to {brightness}")
+
+      # Send the packet to the device (using COMMAND_LIGHT_ATTRIBUTES_SET and adjusting the payload)
+      packet_data = [brightness, 0, 0, 0, 0, 0, 0, 1]
+      self.send_packet(mesh_id, COMMAND_LIGHT_ATTRIBUTES_SET, packet_data)
+
+  def set_color(self, mesh_id, R, G, B, Y=0, W=0, brightness=10):
+      """Set the color (RGB) of the light."""
+      
+      # Convert the RGB and other values to bytes (0–255 range)
+      color_packet = [
+          max(0, min(255, brightness)),  # Brightness (0–255)
+          max(0, min(255, R)),           # Red (0–255)
+          max(0, min(255, G)),           # Green (0–255)
+          max(0, min(255, B)),           # Blue (0–255)
+          max(0, min(255, Y)),           # Yellow (0–255)
+          max(0, min(255, W)),           # White (0–255)
+          0,                             # Music mode
+          0x00                           # Control flag?
+      ]
+
+      # Print out what we're doing (for debugging)
+      print(f"Setting light {mesh_id} color to RGB({R}, {G}, {B}), brightness {brightness}, Y {Y}, W {W}")
+
+      # Send the packet to the device (using the appropriate command)
+      self.send_packet(mesh_id, COMMAND_LIGHT_ATTRIBUTES_SET, color_packet)
+
+  def set_color_temp(self, mesh_id, temperature):
+      """Set the color temperature of the light."""
+      # Clamp temperature between 2700K and 6500K
+      temperature = max(2700, min(6500, temperature))
+
+      # Default Y and W values
+      Y = 0xFF
+      W = 0xFF
+
+      # Convert temperature to Y and W based on the logic
+      if temperature > 4600:
+          Y = int(((6500 - temperature) * 255.0) / 1900.0)
+      else:
+          W = int(((temperature - 2700) * 255.0) / 1900.0)
+
+      # Print out the adjusted values for debugging
+      print(f"Setting light {mesh_id} temperature to {temperature}K -> Y: {Y}, W: {W}")
+
+      # Send the packet to the device (using COMMAND_LIGHT_ATTRIBUTES_SET)
+      packet_data = [
+          0,  # No brightness adjustment in this case
+          0,  # R = 0
+          0,  # G = 0
+          0,  # B = 0
+          Y,  # Y value (yellow)
+          W,  # W value (white)
+          0,  # Reserved byte
+          0x04  # Temperature flag (bit 2 set for temperature)
+      ]
+      self.send_packet(mesh_id, COMMAND_LIGHT_ATTRIBUTES_SET, packet_data)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+      ef parse_time_report(mqtt_client,packet):
+    year = packet[10] + (packet[11] << 8)  # Extract the year from two bytes
+    month = packet[12]  # Month is a single byte
+    day = packet[13]    # Day is a single byte
+    hour = packet[14]   # Hour is a single byte
+    minute = packet[15] # Minute is a single byte
+    second = packet[16] # Second is a single byte
+    
+    timestamp = f"{hour:02d}:{minute:02d}:{second:02d}"
+    datestamp = f"{year:04d}-{month:02d}-{day:02d}"
+
+    # Debug print (similar to #ifdef DEBUG in C++)
+    print(f"Mesh date: {datestamp}, time: {timestamp}")
+
+
+def parse_address_report(mqtt_client,packet):
+    mesh_id = packet[10]  # Extract the mesh ID
+    mac_address = packet[12:18]  # Extract the next 6 bytes for MAC address
+    
+    print(f"Mesh ID: 0x{mesh_id:02X}, MAC Address: {':'.join(format(x, '02x') for x in mac_address)}")
+
+    # Publish the light's mesh ID with availability flag to MQTT
+    topic = f"homeassistant/light/{mesh_id}/config"
+    payload = {
+        "name": f"Light {mesh_id}",
+        "unique_id": f"mesh_light_{mesh_id}",
+        "state_topic": f"homeassistant/light/{mesh_id}/state",
+        "command_topic": f"homeassistant/light/{mesh_id}/set",
+        "availability_topic": f"homeassistant/light/{mesh_id}/available",
+        "payload_available": "true",
+        "payload_not_available": "false",
+        "schema": "json",
+        "brightness": True,
+        "rgb": True,
+        "white_value": True,
+        "color_temp": True,
+        "platform": "mqtt"
+
+    }
+    mqtt_client.publish(topic, json.dumps(payload), retain=True)
+    print(f"Published to MQTT: Topic: {topic}, Payload: {payload}")
+
+    publish_light_availability(mesh_id)
+
+def parse_online_status_report(mqtt_client,packet):
+    """
+    Parse the online status report from the packet.
+    The packet is expected to be a list or bytearray, and we extract brightness and state.
+    """
+    mesh_id = packet[10]
+    brightness = packet[12]
+    state = ~(packet[13] & 1)  # 0x40 = light on, 0x41 = light off
+    
+    # Print the parsed values
+    print(f"Parsed Online Status: Brightness={brightness}, State={'ON' if state == 0 else 'OFF'}")
+
+    # Publish status to MQTT (simple example, adjust topic structure as needed)
+    topic = f"homeassistant/light/{mesh_id}/status"
+    payload = {
+        "mesh_id": mesh_id,
+        "brightness": brightness,
+        "state": "ON" if state == 0 else "OFF",
+    }
+    mqtt_client.publish(topic, json.dumps(payload), retain=True)
+    print(f"Published to MQTT: Topic: {topic}, Payload: {payload}")
+
+    publish_light_availability(mesh_id)
+
+def parse_status_report(mqtt_client,packet):
+    """
+    Parse the status report from the packet.
+    The packet is expected to contain brightness, RGB, and W values.
+    """
+    mesh_id = packet[3]
+    brightness = packet[10]
+    R = packet[11]
+    G = packet[12]
+    B = packet[13]
+    W = packet[15]
+    
+    # Print the parsed values
+    print(f"Parsed Status Report: Brightness={brightness}, RGB=({R},{G},{B}), White={W}")
+    
+    # Publish status to MQTT
+    topic = f"homeassistant/light/{mesh_id}/status"
+    payload = {
+        "mesh_id": mesh_id,
+        "brightness": brightness,
+        "rgb": [R, G, B],
+        "white": W,
+    }
+    mqtt_client.publish(topic, json.dumps(payload), retain=True)
+    print(f"Published to MQTT: Topic: {topic}, Payload: {payload}")
+
+    publish_light_availability(mesh_id)
+
+def parse_device_info_report(mqtt_client,packet):
+    if packet[19] == 0:
+        # Handle the packet with device info (no specific details given)
+        print("Device Info packet received.")
+    elif packet[19] == 2:
+        # Handle the packet with device version
+        print("Device Version packet received.")
+    else:
+        print(f"Unknown device info type: {packet[19]}")
+
+
+def parse_group_id_report(mqtt_client,packet):
+    groups = packet[10:20]  # Extract the next 10 bytes for group IDs
+    
+    print(f"Group IDs: {', '.join(format(x, '02x') for x in groups)}")
+  

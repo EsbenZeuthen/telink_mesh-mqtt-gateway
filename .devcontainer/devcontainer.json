@@ -1,0 +1,15 @@
+{
+    "name": "Briloner MQTT Gateway",
+    "dockerComposeFile": "../docker-compose.yml",  // Path to your docker-compose.yml
+    "service": "briloner_mqtt_gateway_cpp_dev",  // The name of the service from docker-compose.yml
+    "workspaceFolder": "/workspace",  // Where your project will be mounted inside the container
+    "extensions": [
+      "ms-python.python",  // Add any extensions you want to automatically install in the container
+      "ms-azuretools.vscode-docker",
+      "ms-vscode.cpptools-extension-pack",
+      "ms-vscode.cmake-tools"
+    ],
+    "shutdownAction": "none",  // Optional: Prevents container from stopping when VS Code shuts down
+    "postStartCommand": "bash ./.devcontainer/startup.sh"
+  }
+  

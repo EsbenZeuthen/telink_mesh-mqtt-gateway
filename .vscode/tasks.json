@@ -1,0 +1,31 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build BTLE Client Library",
+            "type": "shell",
+            "command": "g++",
+            "args": [
+                "-std=c++11",
+                "-fPIC",
+                "-shared",
+                "-o",
+                "libbtle_client.so",
+                "src/ble/btle_client.cpp",
+                "src/crypto/crypto.cpp",
+                "-I./src/crypto",
+                "-I./src/ble",
+                "-lssl",
+                "-lcrypto",
+                "-lbluetooth",
+                "-lpthread"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": ["$gcc"],
+            "detail": "Generated task to build the BTLE client shared library"
+        }
+    ]
+}

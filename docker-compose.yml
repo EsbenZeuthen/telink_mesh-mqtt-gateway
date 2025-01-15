@@ -1,0 +1,50 @@
+version: '3'
+
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"
+    #networks:
+    #  - dev_network
+    volumes:
+    - ./mosquitto.conf:/mosquitto/config/mosquitto.conf
+    network_mode: host 
+
+  home_assistant:
+    image: homeassistant/home-assistant:stable
+    container_name: home_assistant
+    ports:
+      - "8123:8123"
+    #networks:
+    #  - dev_network
+    network_mode: host 
+
+  briloner_mqtt_gateway_cpp_dev:
+    build:
+      context: .
+      dockerfile: ./.devcontainer/Dockerfile  # Your Python dev container
+    container_name: briloner_mqtt_gateway_cpp_dev
+    #networks:
+    #  - dev_network
+    volumes:
+      - .:/workspace  # Mount your code into the container
+      #- /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:ro
+      #- /lib/systemd:/lib/systemd:ro
+      #- /etc/systemd:/etc/systemd:ro
+    #  - /run/dbus:/host/run/dbus  # Expose the host's D-Bus socket      
+    #  - "/dev:/dev"  # Ensures the container has access to all devices
+    stdin_open: true  # Keep stdin open for interactive terminal sessions
+    tty: true         # Enable TTY for interactive commands
+    privileged: true  # Enable privileged mode    
+    user: root
+    #environment:
+      #- DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
+    devices:
+      - "/dev/hci0:/dev/hci0"  # Pass through Bluetooth device (hci0)
+    network_mode: host     
+
+networks:
+  dev_network:
+    driver: bridge

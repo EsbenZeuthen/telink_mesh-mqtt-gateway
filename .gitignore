@@ -1,0 +1,5 @@
+build/*
+deps/*
+vgcore.*
+destination=:1.215
+core
