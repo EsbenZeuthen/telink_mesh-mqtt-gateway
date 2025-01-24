@@ -154,10 +154,12 @@ void TelinkMesh::connect(uint8_t retries)
     }
     else if (retries>0)
     {
-         Glib::signal_timeout().connect_once([this,retries]() { connect(retries-1);}, 5000);
+        g_warning("Connecting to device %s failed, trying again...",current_best_device->Address.c_str());
+        Glib::signal_timeout().connect_once([this,retries]() { connect(retries-1);}, 5000);
     } else
     {
-        //invoke recovery
+        // retry discovery
+        this->discover();
     }
 }
 
