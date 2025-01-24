@@ -142,7 +142,7 @@ void BlueZProxy::write(const std::string& device_address,const std::string& writ
     auto value_variant = Glib::Variant<std::vector<uint8_t>>::create(payload);
     auto params_variant = Glib::VariantContainerBase::create_tuple(std::vector<Glib::VariantBase>({value_variant,options_variant}));
         
-    // Write the payload to the tharacteristic
+    // Write the payload to the characteristic
     write_char_proxy->call_sync("WriteValue",params_variant);    
 }
 

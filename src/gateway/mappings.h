@@ -297,10 +297,7 @@ std::vector<std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket>> mqtt_to_telin
 
                 auto tmsg = std::make_shared<TelinkMeshProtocol::TelinkLightSetAttributes>();
                 uint8_t W = 0xff, Y = 0xff;
-                tmsg->set_red(0);
-                tmsg->set_green(0);
-                tmsg->set_blue(0);
-                tmsg->set_brightness(100);
+                
 
                 int tK = 1e6/t_mired;
                 
@@ -310,6 +307,7 @@ std::vector<std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket>> mqtt_to_telin
                 } else {
                     W = static_cast<unsigned char>((((float) (tK - 2700)) * 255.0f) / 1900.0f);
                 }
+                tmsg->setDestNode(node_id);
                 tmsg->set_red(0);
                 tmsg->set_green(0);
                 tmsg->set_blue(0);

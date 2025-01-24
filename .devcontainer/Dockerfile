@@ -34,6 +34,7 @@ RUN apt-get update && apt-get install -y \
     libical-dev \
     libreadline-dev \   
     systemd \ 
+    udev \
     python3-docutils \
     libjsoncpp-dev \
     && apt-get clean
@@ -49,6 +50,17 @@ RUN chmod 755 /var/run/dbus
 
 # Optional: Install Doxygen for documentation (if needed)
 RUN apt-get install -y doxygen
+
+# build a patched bluez stack
+RUN git clone https://github.com/bluez/bluez.git
+WORKDIR bluez
+RUN git checkout tags/5.79
+COPY ./telink_notify_fix.patch .
+RUN git apply telink_notify_fix.patch
+RUN ./bootstrap
+RUN ./configure
+RUN make
+RUN make install
 
 # Set up the working directory
 WORKDIR /app

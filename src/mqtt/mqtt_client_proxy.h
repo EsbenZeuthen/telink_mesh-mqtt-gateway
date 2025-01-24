@@ -58,7 +58,7 @@ public:
 
     MQTTMessageSource(mqtt::client& mqttclient) : MQTTEventSource(mqttclient){};
 
-    void setCallback(sigc::slot<void,mqtt::const_message_ptr> callback)
+    void setCallback(sigc::slot<bool,mqtt::const_message_ptr> callback)
     {
         sigMessageRx.connect(callback);
     }
@@ -71,13 +71,16 @@ public:
 
         if (pending_event)
         {
-            sigMessageRx.emit(msg);
+            if (!sigMessageRx.emit(msg))
+            {
+                mqttclient.stop_consuming();
+            };
         }
         // TODO: maybe we need to call wake up here if more messages are pending?
         return true;
     }
 
-    sigc::signal<void,mqtt::const_message_ptr> sigMessageRx;
+    sigc::signal<bool,mqtt::const_message_ptr> sigMessageRx;
         
 };
 
@@ -158,13 +161,17 @@ public:
         }
     }
 
-    void setCallback(sigc::slot<void,mqtt::const_message_ptr> callback)
+    void setCallback(sigc::slot<bool,mqtt::const_message_ptr> callback)
     {
         rxSource.setCallback(callback);
     }
 
     void subscribe(std::string topicfilter) {
-        client.subscribe(topicfilter, 1);
+        client.subscribe(topicfilter, 1);        
+    }
+
+    void start_consuming()
+    {
         client.start_consuming();
     }
 
