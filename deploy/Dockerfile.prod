@@ -56,6 +56,7 @@ WORKDIR /app
 # Copy only the necessary files for production
 COPY ./build/meshgateway .
 COPY ./deploy/startup.sh .
+RUN chmod +x startup.sh
 
 # Define the entrypoint or default command
 CMD ["/app/startup.sh"]

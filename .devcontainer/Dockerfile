@@ -62,17 +62,5 @@ RUN ./configure
 RUN make
 RUN make install
 
-# Set up the working directory
-WORKDIR /app
-
-# Copy source code (if any)
-COPY . /app
-
-# Expose any ports you need (e.g., MQTT, BLE)
-# EXPOSE 1883 (for MQTT)
-
-# Build your project (if applicable)
-# RUN cmake . && make
-
 # Default command
 CMD ["bash"]
