@@ -392,6 +392,10 @@ Glib::RefPtr<Gio::DBus::Proxy> BlueZProxy::get_char_proxy(const Glib::ustring& d
 {
     auto char_path = get_char_path(device_path,char_uuid);
 
+    if (char_path.empty()) {
+        throw std::invalid_argument("Characteristic not found");
+    }
+
      // Create the proxy for the pairing characteristic using its path
     auto char_proxy = Gio::DBus::Proxy::create_sync(
                             connection,
