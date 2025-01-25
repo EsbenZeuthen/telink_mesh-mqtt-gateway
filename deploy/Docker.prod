@@ -1,0 +1,61 @@
+# Use a lightweight base image suitable for production
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install only the required runtime dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \
+    libgtest-dev \
+    cmake \
+    make \
+    g++ \
+    gcc \  
+    doxygen \  
+    dbus \
+    libbluetooth-dev \
+    libdbus-1-dev \
+    libudev-dev \
+    libglibmm-2.4-dev \
+    libpaho-mqtt-dev \
+    libpaho-mqttpp-dev \
+    pkg-config \
+    libssl-dev \
+    libglib2.0-dev \
+    wget \
+    curl \
+    git \
+    autoconf \
+    automake \
+    libtool \
+    libcups2-dev \
+    libical-dev \
+    libreadline-dev \   
+    systemd \ 
+    udev \
+    python3-docutils \
+    libjsoncpp-dev \
+    && apt-get clean
+
+COPY ../telink_notify_fix.patch .
+
+# Install BlueZ (Bluetooth stack) with your patch
+RUN git clone https://github.com/bluez/bluez.git \
+    && cd bluez \
+    && git checkout tags/5.79 \
+    && git apply telink_notify_fix.patch \
+    && ./bootstrap \
+    && ./configure \
+    && make \
+    && make install
+
+# Set up the working directory
+WORKDIR /app
+
+# Copy only the necessary files for production
+COPY ../build/meshgateway .
+COPY ./startup.sh .
+
+# Define the entrypoint or default command
+CMD ["/app/startup.sh"]
