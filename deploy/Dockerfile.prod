@@ -38,7 +38,7 @@ RUN apt-get update && apt-get install -y \
     libjsoncpp-dev \
     && apt-get clean
 
-COPY ../telink_notify_fix.patch .
+COPY ./telink_notify_fix.patch .
 
 # Install BlueZ (Bluetooth stack) with your patch
 RUN git clone https://github.com/bluez/bluez.git \
