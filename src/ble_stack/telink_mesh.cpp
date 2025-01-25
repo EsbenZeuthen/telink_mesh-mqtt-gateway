@@ -136,8 +136,25 @@ void TelinkMesh::connect(uint8_t retries)
                                                          mesh_password,
                                                          vendor_code,
                                                          sigc::mem_fun(this,&TelinkMesh::on_packet_rx));
-        connectedDevice->pair();
-        connectedDevice->activate_notifications();
+        pair(1);
+    }
+    else if (retries>0)
+    {
+        g_warning("Connecting to device %s failed, trying again...",current_best_device->Address.c_str());
+        Glib::signal_timeout().connect_once([this,retries]() { connect(retries-1);}, 5000);
+    } else
+    {
+        // retry discovery
+        g_warning("Connecting to device %s failed, fallback to discovery...",current_best_device->Address.c_str());
+        this->discover();
+    }
+}
+
+void TelinkMesh::pair(uint8_t retries)
+{
+    if (connectedDevice->pair())
+    {
+        connectedDevice->activate_notifications();        
 
         g_message("Paired with %s(%s)",
                    connectedDevice->device_info->Name.c_str(),
@@ -154,13 +171,15 @@ void TelinkMesh::connect(uint8_t retries)
     }
     else if (retries>0)
     {
-        g_warning("Connecting to device %s failed, trying again...",current_best_device->Address.c_str());
-        Glib::signal_timeout().connect_once([this,retries]() { connect(retries-1);}, 5000);
+        g_warning("Pairing with device %s failed, trying again...",current_best_device->Address.c_str());
+        Glib::signal_timeout().connect_once([this,retries]() { pair(retries-1);}, 5000);
     } else
     {
         // retry discovery
+        g_warning("Pairing with device %s failed, fallback to discovery...",current_best_device->Address.c_str());
         this->discover();
     }
+
 }
 
 TelinkMesh::ConnectedDevice::ConnectedDevice( BlueZProxy& ble,
@@ -184,7 +203,7 @@ TelinkMesh::ConnectedDevice::~ConnectedDevice()
 
 }
 
-void TelinkMesh::ConnectedDevice::pair()
+bool TelinkMesh::ConnectedDevice::pair()
 {
     // Prepare pairing request
     auto data = std::vector<uint8_t>(16,0x00);
@@ -199,7 +218,7 @@ void TelinkMesh::ConnectedDevice::pair()
 
     g_debug("Submitting pairing request");
     // submit pairing request
-    ble.write(device_info->Address,pairing_char_uuid,packet);
+    if (!ble.write(device_info->Address,pairing_char_uuid,packet)){return false;};
 
     // wait for response
     g_debug("Waiting for 500ms...");
@@ -211,7 +230,7 @@ void TelinkMesh::ConnectedDevice::pair()
     // Generate the shared key
     shared_key = crypto::generate_sk(mesh_name,mesh_password,random_data,std::vector<uint8_t>(data2.begin()+1,data2.begin()+9));
 
-        
+    return true;
 }
 
 void TelinkMesh::ConnectedDevice::activate_notifications()

@@ -129,21 +129,31 @@ bool BlueZProxy::connect(const std::string& device_address) {
 
 
 
-void BlueZProxy::write(const std::string& device_address,const std::string& write_char_uuid,const std::vector<uint8_t>& payload)
+bool BlueZProxy::write(const std::string& device_address,const std::string& write_char_uuid,const std::vector<uint8_t>& payload)
 {
-    auto device_path = get_device_path(device_address);
-    auto write_char_proxy = get_char_proxy(device_path,write_char_uuid);
+    try {
+        auto device_path = get_device_path(device_address);
+        auto write_char_proxy = get_char_proxy(device_path,write_char_uuid);
 
-   // Prepare options dictionary
-    std::map<Glib::ustring, Glib::VariantBase> options;
-    options["type"] = Glib::Variant<Glib::ustring>::create("request");
-    auto options_variant = Glib::Variant< std::map<Glib::ustring, Glib::VariantBase>>::create(options);
-    // Create a Glib::Variant containing the byte array
-    auto value_variant = Glib::Variant<std::vector<uint8_t>>::create(payload);
-    auto params_variant = Glib::VariantContainerBase::create_tuple(std::vector<Glib::VariantBase>({value_variant,options_variant}));
-        
-    // Write the payload to the characteristic
-    write_char_proxy->call_sync("WriteValue",params_variant);    
+    // Prepare options dictionary
+        std::map<Glib::ustring, Glib::VariantBase> options;
+        options["type"] = Glib::Variant<Glib::ustring>::create("request");
+        auto options_variant = Glib::Variant< std::map<Glib::ustring, Glib::VariantBase>>::create(options);
+        // Create a Glib::Variant containing the byte array
+        auto value_variant = Glib::Variant<std::vector<uint8_t>>::create(payload);
+        auto params_variant = Glib::VariantContainerBase::create_tuple(std::vector<Glib::VariantBase>({value_variant,options_variant}));
+            
+        // Write the payload to the characteristic
+        write_char_proxy->call_sync("WriteValue",params_variant);
+        return true;
+    } catch (const Glib::Error& e) {
+        g_warning("Glib::Error occurred while writing to device %s: %s", device_address.c_str(), e.what().c_str());
+    } catch (const std::exception& e) {
+        g_warning("Standard exception occurred while writing to device %s: %s", device_address.c_str(), e.what());
+    } catch (...) {
+        g_warning("Unknown error occurred while writing to device: %s", device_address.c_str());
+    }
+    return false;
 }
 
 std::vector<uint8_t> BlueZProxy::read(const std::string& device_address,const std::string& read_char_uuid)

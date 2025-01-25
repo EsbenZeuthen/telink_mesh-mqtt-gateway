@@ -38,7 +38,7 @@ public:
 
     void disconnect_by_name(const std::string& device_name);
 
-    void write(const std::string& device_address,const std::string& write_char_uuid,const std::vector<uint8_t>& payload);
+    bool write(const std::string& device_address,const std::string& write_char_uuid,const std::vector<uint8_t>& payload);
 
     std::vector<uint8_t> read(const std::string& device_address,const std::string& read_char_uuid);
 

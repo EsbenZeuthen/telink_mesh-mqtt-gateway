@@ -57,7 +57,7 @@ protected:
             
             ~ConnectedDevice();
 
-            void pair();
+            bool pair();
             void activate_notifications();
             void send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet);
 
@@ -80,6 +80,7 @@ protected:
 
     void discover();
     void connect(uint8_t retries);
+    void pair(uint8_t retries);
     void on_device_found_rssi(std::shared_ptr<BlueZProxy::Device> device_info);    
     void on_packet_rx(std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet);
     
