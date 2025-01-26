@@ -50,18 +50,15 @@ void TelinkMesh::send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket
 {    
     try
     {
-        if (connectedDevice)
-        {    
-            connectedDevice->send(packet);       
-        }
-        else
+        if (!connectedDevice || !connectedDevice->send(packet))        
         {            
-            throw "Not connected to a device";
+            throw "Send failed";
         }
     }
     catch(const std::exception& e)
     {
         // assume the connection is broken
+        g_debug("Send error, assuming connection is broken.");
         connectedDevice = nullptr;
         discover();
         throw;
@@ -71,7 +68,8 @@ void TelinkMesh::send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket
 void TelinkMesh::discover()
 {   
     if (!discovering)
-    {
+    {        
+        ble.disconnect_by_name(mesh_name);
         discovering = true;
         connectedDevice = nullptr;
         current_best_device = nullptr;
@@ -97,7 +95,7 @@ void TelinkMesh::discover()
     }
 }
 
-void TelinkMesh::ConnectedDevice::send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet)
+bool TelinkMesh::ConnectedDevice::send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet)
 {
     if(packet_seq == 0) {packet_seq++;}
     packet->setSeq(packet_seq++);    
@@ -108,7 +106,7 @@ void TelinkMesh::ConnectedDevice::send(const std::shared_ptr<TelinkMeshProtocol:
     auto data = packet->getData();
     auto enc_packet = crypto::encrypt_packet(shared_key, macdata, data);
 
-    ble.write(device_info->Address,"00010203-0405-0607-0809-0a0b0c0d1912",enc_packet);   
+    return ble.write(device_info->Address,"00010203-0405-0607-0809-0a0b0c0d1912",enc_packet);   
 }
 
 void TelinkMesh::on_device_found_rssi(std::shared_ptr<BlueZProxy::Device> device_info)

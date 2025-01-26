@@ -59,7 +59,7 @@ protected:
 
             bool pair();
             void activate_notifications();
-            void send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet);
+            bool send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> packet);
 
             std::shared_ptr<BlueZProxy::Device> device_info;
         protected:
