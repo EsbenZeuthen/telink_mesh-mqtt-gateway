@@ -248,13 +248,19 @@ void TelinkMesh::ConnectedDevice::activate_notifications()
 
 void TelinkMesh::ConnectedDevice::on_data_rx(const std::vector<uint8_t>& data)
 {        
-    auto decrypted_data = crypto::decrypt_packet(shared_key,macdata,data);
-    
-    auto packet = TelinkMeshProtocol::TelinkMeshPacket::create(decrypted_data);
-    
-    g_info("Received mesh packet");
-    packet->debug();
-    sigPacketRx.emit(packet);
+    try {    
+        auto decrypted_data = crypto::decrypt_packet(shared_key,macdata,data);
+        
+        auto packet = TelinkMeshProtocol::TelinkMeshPacket::create(decrypted_data);
+        
+        g_info("Received mesh packet");
+        packet->debug();
+        sigPacketRx.emit(packet);
+    }
+    catch(std::exception e)
+    {
+        g_warning("Unexpected data from mesh, dropping data packet. Exception: %s",e.what());
+    }
 }
 
 // Function to convert MAC address to a reversed std::vector<uint8_t>

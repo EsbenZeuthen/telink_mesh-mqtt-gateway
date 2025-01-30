@@ -209,7 +209,8 @@ public:
                     case Command::COMMAND_TIME_REPORT:
                         return std::make_shared<TelinkMeshTimeReport>(data);                    
                     default:
-                        throw std::runtime_error("Unexpected command type");
+                        g_warning("Cannot decode mesh command type 0x%02X",cmd);
+                        throw std::runtime_error("Unexpected mesh command type");
                 }
             }
 
