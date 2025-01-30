@@ -14,10 +14,8 @@ RUN apt-get update && apt-get install -y \
     gcc \
     gdb \
     valgrind \
-    dbus \
     libbluetooth-dev \
     libdbus-1-dev \
-    libudev-dev \
     libglibmm-2.4-dev \
     libpaho-mqtt-dev \
     libpaho-mqttpp-dev \
@@ -33,34 +31,9 @@ RUN apt-get update && apt-get install -y \
     libcups2-dev \
     libical-dev \
     libreadline-dev \   
-    systemd \ 
-    udev \
-    python3-docutils \
     libjsoncpp-dev \
     && apt-get clean
 
-
-RUN mkdir -p /var/run/dbus
-RUN chmod 755 /var/run/dbus
-
-# Install BlueZ (Bluetooth stack)
-#RUN apt-get update && apt-get install -y \
-#    bluez \
-#    && apt-get clean
-
-# Optional: Install Doxygen for documentation (if needed)
-RUN apt-get install -y doxygen
-
-# build a patched bluez stack
-RUN git clone https://github.com/bluez/bluez.git
-WORKDIR bluez
-RUN git checkout tags/5.79
-COPY ./telink_notify_fix.patch .
-RUN git apply telink_notify_fix.patch
-RUN ./bootstrap
-RUN ./configure
-RUN make
-RUN make install
 
 # Default command
 CMD ["bash"]

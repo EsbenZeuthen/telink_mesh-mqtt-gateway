@@ -1,0 +1,52 @@
+# Use a lightweight base image suitable for production
+FROM ubuntu:22.04
+
+# Set environment variables
+ENV DEBIAN_FRONTEND=noninteractive
+
+# Install only the required runtime dependencies
+RUN apt-get update && apt-get install -y \
+    build-essential \    
+    make \
+    g++ \
+    gcc \  
+    doxygen \      
+    libbluetooth-dev \
+    libdbus-1-dev \
+    libudev-dev \
+    libglibmm-2.4-dev \
+    libpaho-mqtt-dev \
+    libpaho-mqttpp-dev \
+    pkg-config \
+    libssl-dev \
+    libglib2.0-dev \
+    wget \
+    curl \
+    git \
+    autoconf \
+    automake \
+    libtool \
+    libcups2-dev \
+    libical-dev \
+    libreadline-dev \   
+    systemd \ 
+    udev \
+    python3-docutils \
+    libjsoncpp-dev \
+    && apt-get clean
+
+COPY telink_notify_fix.patch .
+
+# Install BlueZ (Bluetooth stack) with your patch
+RUN git clone https://github.com/bluez/bluez.git
+WORKDIR /bluez
+RUN git checkout tags/5.79
+RUN git apply ../telink_notify_fix.patch
+RUN ./bootstrap
+RUN ./configure
+RUN make
+RUN make install
+
+# Define the entrypoint or default command
+CMD ["bash"]
+#CMD ["/usr/local/libexec/bluetooth/bluetoothd","--nodetach"]

@@ -1,5 +1,3 @@
-version: '3'
-
 services:
   mqtt:
     image: eclipse-mosquitto:latest
@@ -15,10 +13,32 @@ services:
   home_assistant:
     image: homeassistant/home-assistant:stable
     container_name: home_assistant
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket 
     ports:
       - "8123:8123"
     #networks:
     #  - dev_network
+    privileged: true
+    network_mode: host
+
+  bluez_customized:
+    build:
+      context: ./deploy/bluez_customized
+      dockerfile: Dockerfile.prod
+    container_name: bluez_customized
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket 
+  #    - /dev:/dev                  # Expose the host's Bluetooth device to the container
+  #    - /sys:/sys                  # Mount sys files for Bluetooth access
+
+      #- /sys/fs/cgroup:/sys/fs/cgroup:ro  # Mount cgroup filesystem
+    security_opt:
+      - apparmor=unconfined
+    privileged: true
+    stdin_open: true  # Keep stdin open for interactive terminal sessions
+    tty: true     
+    user: root     
     network_mode: host 
 
   briloner_mqtt_gateway_cpp_dev:
@@ -30,19 +50,18 @@ services:
     #  - dev_network
     volumes:
       - .:/workspace  # Mount your code into the container
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket   # Expose the host's D-Bus socket 
       #- /usr/lib/x86_64-linux-gnu/pkgconfig:/usr/lib/x86_64-linux-gnu/pkgconfig:ro
       #- /lib/systemd:/lib/systemd:ro
       #- /etc/systemd:/etc/systemd:ro
     #  - /run/dbus:/host/run/dbus  # Expose the host's D-Bus socket      
     #  - "/dev:/dev"  # Ensures the container has access to all devices
+    security_opt:
+      - apparmor=unconfined
     stdin_open: true  # Keep stdin open for interactive terminal sessions
     tty: true         # Enable TTY for interactive commands
     privileged: true  # Enable privileged mode    
-    user: root
-    #environment:
-      #- DBUS_SYSTEM_BUS_ADDRESS=unix:path=/host/run/dbus/system_bus_socket
-    devices:
-      - "/dev/hci0:/dev/hci0"  # Pass through Bluetooth device (hci0)
+    user: root     
     network_mode: host     
 
 networks:

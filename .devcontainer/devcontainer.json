@@ -9,7 +9,7 @@
       "ms-vscode.cpptools-extension-pack",
       "ms-vscode.cmake-tools"
     ],
-    "shutdownAction": "none",  // Optional: Prevents container from stopping when VS Code shuts down
-    "postStartCommand": "bash ./.devcontainer/startup.sh"
+    "shutdownAction": "none"  // Optional: Prevents container from stopping when VS Code shuts down
+   // "postStartCommand": "bash ./.devcontainer/startup.sh"
   }
   
