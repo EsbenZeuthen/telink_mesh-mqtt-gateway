@@ -48,5 +48,5 @@ RUN make
 RUN make install
 
 # Define the entrypoint or default command
-CMD ["bash"]
-#CMD ["/usr/local/libexec/bluetooth/bluetoothd","--nodetach"]
+#CMD ["bash"]
+CMD ["/usr/local/libexec/bluetooth/bluetoothd","--nodetach"]
