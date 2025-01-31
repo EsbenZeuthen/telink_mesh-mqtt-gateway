@@ -64,18 +64,24 @@ public:
     }
 
     bool dispatch(sigc::slot_base* callback) override {
+        try{
+            g_debug("Dequeueing MQTT message");
+            // get message from the queue
+            mqtt::const_message_ptr msg;
+            pending_event = mqttclient.try_consume_message(&msg);
 
-        // get message from the queue
-        mqtt::const_message_ptr msg;
-        pending_event = mqttclient.try_consume_message(&msg);
-
-        if (pending_event)
-        {
-            if (!sigMessageRx.emit(msg))
+            if (pending_event)
             {
-                mqttclient.stop_consuming();
-            };
+                if (!sigMessageRx.emit(msg))
+                {
+                    mqttclient.stop_consuming();
+                };
+            }
         }
+        catch(const std::exception& e)
+        {
+            g_warning("Unexpected exception: %s",e.what());
+        }                                
         // TODO: maybe we need to call wake up here if more messages are pending?
         return true;
     }
@@ -101,16 +107,24 @@ public:
     }
 
     void message_arrived(mqtt::const_message_ptr msg) override {
+        try
+        {
+            /* code */
+                
+            // Extract the payload and topic from the message
+            std::string payload = msg->get_payload_str();  // Get the payload as a string
+            std::string topic = msg->get_topic();
 
-        // Extract the payload and topic from the message
-        std::string payload = msg->get_payload_str();  // Get the payload as a string
-        std::string topic = msg->get_topic();
-
-        // Use g_debug to output the topic and payload of the message
-        g_debug("Received MQTT message with topic: %s", topic.c_str());
-        g_debug("Message payload: %s", payload.c_str());
-        
-        rxSource.trigger_event();  // Trigger the event directly in the custom source
+            // Use g_debug to output the topic and payload of the message
+            g_debug("Received MQTT message with topic: %s", topic.c_str());
+            g_debug("Message payload: %s", payload.c_str());
+            
+            rxSource.trigger_event();  // Trigger the event directly in the custom source
+        }
+        catch(const std::exception& e)
+        {
+            g_warning("Unexpected exception: %s",e.what());
+        }                                
     }
     
     void delivery_complete (mqtt::delivery_token_ptr tok)
@@ -155,9 +169,9 @@ public:
         conn_opts.set_clean_session(true);
         try {
             client.connect(conn_opts);
-            std::cout << "Connected to broker." << std::endl;
+            g_info("Connected to broker.");
         } catch (const mqtt::exception& e) {
-            std::cout << "Error: " << e.what() << std::endl;
+            g_warning("Unexpected exception: %s",e.what());            
         }
     }
 

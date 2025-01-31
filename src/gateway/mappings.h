@@ -233,7 +233,7 @@ std::vector<std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket>> mqtt_to_telin
         }
 
         if (topic_parts.size() != 4 || topic_parts[0] != "homeassistant" || topic_parts[1] != "light") {
-            std::cerr << "Invalid topic format, ignoring message." << std::endl;            
+            g_warning("Invalid topic format, ignoring message."); 
         }
 
         // Extract the mesh node ID from the topic
@@ -248,7 +248,7 @@ std::vector<std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket>> mqtt_to_telin
         std::istringstream payload_str(msg->get_payload());
 
         if (!Json::parseFromStream(reader, payload_str, &payload, &errs)) {
-            std::cerr << "Error decoding JSON payload: " << errs << ". Ignoring message." << std::endl;            
+            g_warning("Error decoding JSON payload: %s. Ignoring message.",errs.c_str());
         }
 
     // Determine purpose and map to telink packet
@@ -258,9 +258,7 @@ std::vector<std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket>> mqtt_to_telin
             if (payload.isMember("state")) {
                 std::string state = payload["state"].asString();
                 std::transform(state.begin(), state.end(), state.begin(), ::toupper);
-
-                std::cout << "State: " << state << std::endl;
-
+                
                 auto tmsg = std::make_shared<TelinkMeshProtocol::TelinkLightOnOff>();
                 
                 tmsg->set_on_off(state == "ON");

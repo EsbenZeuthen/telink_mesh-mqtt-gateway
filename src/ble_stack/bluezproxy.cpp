@@ -46,15 +46,15 @@ void BlueZProxy::start_scan(sigc::slot<void,const std::string, const std::string
 
         // Handle the returned value if any
         if (!result.gobj()) { // Check if the result is empty
-            std::cerr << "No response received from StartDiscovery call." << std::endl;
+            g_warning("No response received from StartDiscovery call.");
         } else {
-            std::cout << "Started scanning for devices successfully." << std::endl;
+            g_message("Started scanning for devices successfully.");
         }
 
         sigDeviceFound.connect(callback);
 
     } catch (const Glib::Error& e) {
-        std::cerr << "Error starting device discovery: " << e.what() << std::endl;
+        g_warning("Error starting device discovery: %s",e.what().c_str());
     }
 
 }
@@ -77,15 +77,15 @@ void BlueZProxy::start_rssi_scan(sigc::slot<void,std::shared_ptr<Device>> callba
 
         // Handle the returned value if any
         if (!result.gobj()) { // Check if the result is empty
-            std::cerr << "No response received from StartDiscovery call." << std::endl;
+            g_warning("No response received from StartDiscovery call.");
         } else {
-            std::cout << "Started scanning for devices successfully." << std::endl;
+            g_message("Started scanning for devices successfully.");
         }
 
         sigDeviceFoundByRSSI.connect(callback);
 
     } catch (const Glib::Error& e) {
-        std::cerr << "Error starting device discovery: " << e.what() << std::endl;
+        g_warning("Error starting device discovery: %s",e.what().c_str());
     }
 
 }
@@ -203,7 +203,7 @@ void BlueZProxy::disconnect_by_name(const std::string& device_name) {
         // Get managed objects
         auto result = om_proxy->call_sync("GetManagedObjects");
 
-        std::cout << result.get_type_string() << std::endl;
+        //std::cout << result.get_type_string() << std::endl;
         // Unpack the variant containing the managed objects
         auto objects = Glib::VariantBase::cast_dynamic<
                                 Glib::Variant<

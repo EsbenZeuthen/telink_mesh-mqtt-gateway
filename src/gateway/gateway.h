@@ -24,14 +24,30 @@ class Gateway
 
             // Schedule heartbeat/discovery
             Glib::signal_timeout().connect([this]() {
-                auto query = prepareStatusQuery();
-                this->send_if_ready({query});
+                try
+                {
+                    g_debug("Status query heartbeat");
+                    auto query = prepareStatusQuery();
+                    this->send_if_ready({query});
+                }
+                catch(const std::exception& e)
+                {
+                    g_warning("Unexpected exception: %s",e.what());
+                }                                
                 return true;
             }, 30000);
 
             Glib::signal_timeout().connect([this]() {
-                auto query = prepareAddressQuery();
-                this->send_if_ready({query});
+                try
+                {
+                    g_debug("Address query heartbeat");
+                    auto query = prepareAddressQuery();
+                    this->send_if_ready({query});
+                }
+                catch(const std::exception& e)
+                {
+                    g_warning("Unexpected exception: %s",e.what());
+                }                                
                 return true;
             }, 60000);
         }
@@ -113,12 +129,18 @@ class Gateway
 
                         Glib::signal_timeout().connect_once(
                             [packets, retryCount, this]() {
-                                if(send_when_ready(packets, retryCount + 1))
+                                try {
+                                    if(send_when_ready(packets, retryCount + 1))
+                                    {
+                                        // enable mqtt
+                                        mqtt_enabled = true;
+                                        //start consuming
+                                        mqtt->start_consuming();
+                                    }
+                                }
+                                catch (std::exception e)
                                 {
-                                    // enable mqtt
-                                    mqtt_enabled = true;
-                                    //start consuming
-                                    mqtt->start_consuming();
+                                    g_warning("Unexpected exception: %s",e.what());
                                 }
                             },
                             1000 // Retry delay in milliseconds
