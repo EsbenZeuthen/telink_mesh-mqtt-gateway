@@ -18,12 +18,11 @@ class Gateway
             mqtt->connect();
             mqtt->subscribe("homeassistant/light/+/set");
 
-            /* Query to get the mesh going */
-            auto query = prepareAddressQuery();
-            send_when_ready({query});
+            // start the heartbeat with an address query
+            heartbeat(true,30000);
 
             // Schedule heartbeat/discovery
-            Glib::signal_timeout().connect([this]() {
+            /*Glib::signal_timeout().connect([this]() {
                 try
                 {
                     g_debug("Status query heartbeat");
@@ -49,7 +48,28 @@ class Gateway
                     g_warning("Unexpected exception: %s",e.what());
                 }                                
                 return true;
-            }, 60000);
+            }, 60000);*/
+        }
+
+        void heartbeat(bool address_or_status, uint32_t interval)
+        {
+            try
+            {
+                if (address_or_status){
+                    g_debug("Address query heartbeat");
+                    auto query = prepareAddressQuery();
+                    this->send_if_ready({query});
+                } else {
+                    g_debug("Status query heartbeat");
+                    auto query = prepareStatusQuery();
+                    this->send_if_ready({query});
+                }
+            }
+            catch(const std::exception& e)
+            {
+                g_warning("Unexpected exception: %s",e.what());
+            }
+            Glib::signal_timeout().connect_once([this,address_or_status,interval]() {heartbeat(!address_or_status,interval);},interval);
         }
 
         void onMeshMessage(std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket> msg)

@@ -63,6 +63,10 @@ services:
     privileged: true  # Enable privileged mode    
     user: root     
     network_mode: host     
+    environment:
+      - G_MESSAGES_DEBUG=all
+      - G_DEBUG=gc-friendly
+
 
 networks:
   dev_network:
