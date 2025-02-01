@@ -52,17 +52,25 @@ void TelinkMesh::send(const std::shared_ptr<TelinkMeshProtocol::TelinkMeshPacket
     {
         if (!connectedDevice || !connectedDevice->send(packet))        
         {            
-            throw "Send failed";
+            throw std::runtime_error("Send failed");
         }
     }
     catch(const std::exception& e)
     {
         // assume the connection is broken
-        g_debug("Send error, assuming connection is broken.");
+        g_debug("Send error %s, assuming connection is broken.",e.what());
         connectedDevice = nullptr;
         discover();
         throw;
-    }                
+    }
+    catch(...)
+    {
+        // assume the connection is broken
+        g_debug("Unknown exception type during send, assuming connection is broken.");
+        connectedDevice = nullptr;
+        discover();
+        throw;
+    }
 }
 
 void TelinkMesh::discover()

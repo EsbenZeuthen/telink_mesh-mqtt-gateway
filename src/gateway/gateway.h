@@ -189,6 +189,9 @@ class Gateway
                 } catch (const std::exception& e)                
                 {
                     g_warning("Error during send - dropping packets. Exception %s",e.what());
+                } catch (...)
+                {
+                    g_warning("Error during send - dropping packets. Exception type unknown.");
                 }
             }
             else
