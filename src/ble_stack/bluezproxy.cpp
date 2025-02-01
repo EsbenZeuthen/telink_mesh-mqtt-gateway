@@ -2,7 +2,11 @@
 #include <iostream>
 #include <giomm/dbusproxy.h>
 #include <giomm/dbusconnection.h>
+#include <glib.h>
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "BluezProxy"
+#define G_LOG_USE_STRUCTURED 1
 BlueZProxy::BlueZProxy()
     {
     setup_dbus_proxy();

@@ -5,6 +5,9 @@
 #include <glibmm/main.h>
 #include <mqtt/client.h>
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "MQTT Client"
+
 class MQTTEventSource : public Glib::Source {
 public:
     MQTTEventSource(mqtt::client& mqttclient)

@@ -5,6 +5,9 @@
 #include "../mqtt/mqtt_client_proxy.h"
 #include "mappings.h"
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "Gateway"
+
 class Gateway
 {
     public:

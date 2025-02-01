@@ -10,6 +10,8 @@
 #include <cstring> 
 #include <endian.h>
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "Mesh protocol"
 
 #define MAX_PACKET_SIZE 20
 

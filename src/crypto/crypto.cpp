@@ -8,6 +8,9 @@
 #include <random>
 #include <cassert>
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "Crypto"
+
 namespace crypto {
 
 std::vector<uint8_t> get_random_bytes(size_t num_bytes) {

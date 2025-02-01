@@ -6,6 +6,9 @@
 #include <iomanip>
 #include "../ble_stack/telink_mesh_protocol.h"
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "Mappings"
+
 mqtt::message::ptr_t telink_to_mqtt(std::shared_ptr<TelinkMeshProtocol::TelinkMeshAddressReport> msg)
 {          
     auto mac_address = msg->getMAC();

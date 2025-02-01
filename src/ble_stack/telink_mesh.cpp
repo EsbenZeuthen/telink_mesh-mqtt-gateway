@@ -4,6 +4,9 @@
 
 #include "telink_mesh.h"
 
+#undef G_LOG_DOMAIN
+#define G_LOG_DOMAIN "Mesh"
+
 TelinkMesh::TelinkMesh( BlueZProxy& bluetoothproxy,
                         const std::string& mesh_name,
                         const std::string& mesh_password,

@@ -1,8 +1,12 @@
+#define G_LOG_USE_STRUCTURED 1
 #include "ble_stack/telink_mesh.h"
 #include "mqtt/mqtt_client_proxy.h"
 #include "gateway/gateway.h"
+#include "logging/log_handler.h"
 
 int main() {
+    g_log_set_writer_func(structured_log_writer, NULL, NULL);
+    g_message("test");
     while(true)
     {
         try

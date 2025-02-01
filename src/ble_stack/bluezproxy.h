@@ -1,6 +1,7 @@
 #ifndef BLUEZ_PROXY_H
 #define BLUEZ_PROXY_H
 
+#define G_LOG_USE_STRUCTURED 1
 #include <giomm.h>
 #include <string>
 #include <sigc++/sigc++.h>
