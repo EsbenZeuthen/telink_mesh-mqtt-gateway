@@ -96,9 +96,18 @@ void BlueZProxy::start_rssi_scan(sigc::slot<void,std::shared_ptr<Device>> callba
 
 void BlueZProxy::stop_scan()
 {
-     adapter_proxy_->call_sync("StopDiscovery");
-     sigDeviceFound.clear();
-     sigDeviceFoundByRSSI.clear();
+    try
+    {
+        adapter_proxy_->call_sync("StopDiscovery");
+        sigDeviceFound.clear();
+        sigDeviceFoundByRSSI.clear();
+    } catch (const Glib::Error& e) {
+        g_warning("Glib::Error: %s", e.what().c_str());
+    } catch (const std::exception& e) {
+        g_warning("Standard exception: %s", e.what());
+    } catch (...) {
+        g_warning("Unknown error");
+    }    
 }
 
 bool BlueZProxy::connect(const std::string& device_address) {
@@ -131,7 +140,33 @@ bool BlueZProxy::connect(const std::string& device_address) {
     return false;
 }
 
+void BlueZProxy::disconnect(const std::string& device_address)
+{
+    try {
+        auto device_proxy_ = get_device_proxy(device_address);
+        
+        if (!device_proxy_) {
+            g_warning("Failed to create proxy for device: %s", device_address.c_str());
+            return;
+        }
 
+        // Call BlueZ Device1's `Connect` method
+        auto method_call = device_proxy_->call_sync("Disconnect");
+
+        if (!method_call) {
+            g_warning("Error while diconnecting %s", device_address.c_str());
+            return;
+        }
+
+        g_message("Successfully disconnected device: %s", device_address.c_str());        
+    } catch (const Glib::Error& e) {
+        g_warning("Glib::Error occurred while disconnecting device %s: %s", device_address.c_str(), e.what().c_str());
+    } catch (const std::exception& e) {
+        g_warning("Standard exception occurred while disconnecting device %s: %s", device_address.c_str(), e.what());
+    } catch (...) {
+        g_warning("Unknown error occurred while disconnecting device: %s", device_address.c_str());
+    }    
+}
 
 bool BlueZProxy::write(const std::string& device_address,const std::string& write_char_uuid,const std::vector<uint8_t>& payload)
 {

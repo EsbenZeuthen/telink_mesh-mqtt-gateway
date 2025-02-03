@@ -81,6 +81,7 @@ void TelinkMesh::discover()
     if (!discovering)
     {        
         ble.disconnect_by_name(mesh_name);
+        ble.stop_scan();
         discovering = true;
         connectedDevice = nullptr;
         current_best_device = nullptr;
@@ -209,7 +210,7 @@ TelinkMesh::ConnectedDevice::ConnectedDevice( BlueZProxy& ble,
 
 TelinkMesh::ConnectedDevice::~ConnectedDevice()
 {
-
+    ble.disconnect(device_info->Address);
 }
 
 bool TelinkMesh::ConnectedDevice::pair()
