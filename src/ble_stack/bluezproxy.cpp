@@ -76,6 +76,8 @@ void BlueZProxy::start_rssi_scan(sigc::slot<void,std::shared_ptr<Device>> callba
             {},        // Object path (can be empty if not filtering by path)
             {}                  // First argument to filter by (optional, typically empty)            
         );
+
+        sigDeviceFoundByRSSI.connect(callback);
         
         auto result = adapter_proxy_->call_sync("StartDiscovery", Glib::VariantContainerBase());
 
@@ -84,12 +86,10 @@ void BlueZProxy::start_rssi_scan(sigc::slot<void,std::shared_ptr<Device>> callba
             g_warning("No response received from StartDiscovery call.");
         } else {
             g_message("Started scanning for devices successfully.");
-        }
-
-        sigDeviceFoundByRSSI.connect(callback);
+        }        
 
     } catch (const Glib::Error& e) {
-        g_warning("Error starting device discovery: %s",e.what().c_str());
+        g_warning("Error starting device discovery: %s",e.what().c_str());   
     }
 
 }
