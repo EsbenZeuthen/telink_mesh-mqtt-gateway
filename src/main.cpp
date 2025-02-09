@@ -5,8 +5,7 @@
 #include "logging/log_handler.h"
 
 int main() {
-    g_log_set_writer_func(structured_log_writer, NULL, NULL);
-    g_message("test");
+    g_log_set_writer_func(structured_log_writer, NULL, NULL);    
     while(true)
     {
         try
@@ -37,6 +36,12 @@ int main() {
         catch(const std::exception& e)
         {
             g_warning("Unhandled exception: %s \n\n Attempting to restart...",e.what());
+        } catch (const Glib::Error& e) {
+            g_warning("Unhandled exception: %s",e.what().c_str());   
+        } catch (...)   
+        {
+            g_warning("Caught unknown exception type...");   
         }
+    
     }
 }

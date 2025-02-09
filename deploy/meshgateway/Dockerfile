@@ -1,11 +1,16 @@
 # ---------
 # Stage 1: Development Environment (No Forced Build)
 # ---------
-    FROM ubuntu:22.04 AS dev
+    FROM debian:bookworm AS dev
 
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
     
+    RUN apt-get update && apt-get install -y software-properties-common
+    RUN add-apt-repository main && \
+        add-apt-repository contrib && \
+        add-apt-repository non-free
+
     # Install all development dependencies
     RUN apt-get update && apt-get install -y \
         build-essential \
@@ -64,26 +69,27 @@
     # ---------
     # Stage 3: Production (Minimal Runtime)
     # ---------
-    FROM ubuntu:22.04 AS production
+    FROM debian:bookworm-slim AS production
     
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
     
     # Install only runtime dependencies
-    RUN apt-get update && apt-get install -y \
-        libbluetooth-dev \
-        libdbus-1-dev \
-        libudev-dev \
-        libglibmm-2.4-dev \
-        libpaho-mqtt-dev \
-        libpaho-mqttpp-dev \
-        libssl-dev \
-        libglib2.0-dev \
-        libcups2-dev \
-        libical-dev \
-        libreadline-dev \
-        libjsoncpp-dev \
-        && apt-get clean
+    RUN apt-get update && apt-get install -y --no-install-recommends\
+        #libbluetooth3\
+       # libdbus-1-3 \
+       # libudev1 \
+        libglibmm-2.4 \        
+        libpaho-mqttpp3-1 \
+        libssl3 \
+        libglib2.0 \
+       # libcups2 \
+       # libical3 \
+       # libreadline8 \
+        libjsoncpp25 \
+        && apt-get clean \
+        && rm -rf /var/lib/apt/lists/*  # Removes package lists to reduce image size
+
     
     # Set working directory
     WORKDIR /app

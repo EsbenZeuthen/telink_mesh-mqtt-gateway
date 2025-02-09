@@ -29,7 +29,7 @@ jobs:
     - name: Build and push multi-platform Docker image
       run: |
         docker buildx build . \
-          --platform linux/arm64 \
+          --platform linux/amd64,linux/arm64 \
           -t ghcr.io/${GITHUB_REPOSITORY,,}/briloner-mqtt-gateway:latest \
           -f ./deploy/meshgateway/Dockerfile \
           --target production --push

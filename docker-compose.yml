@@ -67,8 +67,4 @@ services:
     environment:
       - G_MESSAGES_DEBUG=all
       - G_DEBUG=gc-friendly
-
-
-networks:
-  dev_network:
-    driver: bridge
+      - BUILD_TESTS=true

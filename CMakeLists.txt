@@ -72,7 +72,7 @@ set_target_properties(meshgateway PROPERTIES
 #  crypto
 #)
 
-if(BUILD_TESTS)
+if(${BUILD_TESTS})
 
   # Enable testing
   enable_testing()
