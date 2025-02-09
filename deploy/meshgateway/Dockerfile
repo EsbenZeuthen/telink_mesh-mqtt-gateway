@@ -6,11 +6,6 @@
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
     
-    RUN apt-get update && apt-get install -y software-properties-common
-    RUN add-apt-repository main && \
-        add-apt-repository contrib && \
-        add-apt-repository non-free
-
     # Install all development dependencies
     RUN apt-get update && apt-get install -y \
         build-essential \
