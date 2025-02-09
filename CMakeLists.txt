@@ -33,12 +33,6 @@ include_directories(
 
 link_directories(/usr/lib/x86_64-linux-gnu)
 
-# Enable testing
-enable_testing()
-
-# Add Google Test library
-find_package(GTest REQUIRED)
-
 add_executable(meshgateway
   src/main.cpp
   src/crypto/crypto.cpp
@@ -64,39 +58,48 @@ set_target_properties(meshgateway PROPERTIES
 )
 
 # Bluetooth PoC executable
-add_executable(ble_poc
-    src/ble_poc.cpp
-    src/crypto/crypto.cpp
-)
+#add_executable(ble_poc
+#    src/ble_poc.cpp
+#    src/crypto/crypto.cpp
+#)
 
 # Link libraries for Bluetooth PoC
-target_link_libraries(ble_poc
-  ${GLIB2_LIBRARIES}
-  ${GLIBMM_LIBRARIES}
-  ${BLUETOOTH_LIBRARIES}
-  ${GIO_LIBRARIES}
-  crypto
-)
+#target_link_libraries(ble_poc
+#  ${GLIB2_LIBRARIES}
+#  ${GLIBMM_LIBRARIES}
+#  ${BLUETOOTH_LIBRARIES}
+#  ${GIO_LIBRARIES}
+#  crypto
+#)
 
-# Crypto test executable
-add_executable(crypto_tests
-    tests/test_crypto.cpp
-    src/crypto/crypto.cpp
-)
+if(BUILD_TESTS)
 
-# Link libraries for Crypto test
-target_link_libraries(crypto_tests 
-    GTest::GTest 
-    GTest::Main 
-    pthread 
-    ssl 
-    crypto
-)
+  # Enable testing
+  enable_testing()
 
-# Include directories for test sources
-target_include_directories(crypto_tests PRIVATE src/crypto)
+  # Add Google Test library
+  find_package(GTest REQUIRED)
 
-# Add tests to CTest
-add_test(NAME CryptoTests COMMAND crypto_tests)
+  # Crypto test executable
+  add_executable(crypto_tests
+      tests/test_crypto.cpp
+      src/crypto/crypto.cpp
+  )
+
+  # Link libraries for Crypto test
+  target_link_libraries(crypto_tests 
+      GTest::GTest 
+      GTest::Main 
+      pthread 
+      ssl 
+      crypto
+  )
+
+  # Include directories for test sources
+  target_include_directories(crypto_tests PRIVATE src/crypto)
+
+  # Add tests to CTest
+  add_test(NAME CryptoTests COMMAND crypto_tests)
 
 
+endif()

@@ -44,7 +44,8 @@ services:
   briloner_mqtt_gateway_cpp_dev:
     build:
       context: .
-      dockerfile: ./.devcontainer/Dockerfile  # Your Python dev container
+      dockerfile: ./deploy/meshgateway/Dockerfile  # Your Python dev container
+      target: dev
     container_name: briloner_mqtt_gateway_cpp_dev
     #networks:
     #  - dev_network
