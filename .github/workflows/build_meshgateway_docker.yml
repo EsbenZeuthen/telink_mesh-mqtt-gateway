@@ -12,9 +12,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    steps:
     - name: Checkout repository
       uses: actions/checkout@v2
+      with:
+        fetch-depth: 0  # Ensure full history for git diff to work
 
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
@@ -34,17 +35,22 @@ jobs:
           -f ./deploy/meshgateway/Dockerfile \
           --target production --push
 
-    # Check if bluez_customized Dockerfile changed
     - name: Check if bluez_customized Dockerfile changed
+      id: checkBluez
       run: |
-        git diff --exit-code -- ./deploy/bluez_customized/Dockerfile || echo "Bluez Dockerfile changed"
+        if git diff --quiet HEAD^ HEAD -- ./deploy/bluez_customized/Dockerfile; then
+          echo "status=unchanged" >> $GITHUB_ENV
+        else
+          echo "status=changed" >> $GITHUB_ENV
+        fi
+
     
-    # Build and push bluez_customized Docker image if it changed
-    - name: Build and push bluez_customized Docker image
-      if: success() && steps.checkBluez.outputs.status == 'changed'
+      - name: Build and push bluez_customized Docker image
+      if: env.status == 'changed'
       run: |
         docker buildx build . \
           --platform linux/amd64,linux/arm64 \
           -t ghcr.io/${GITHUB_REPOSITORY,,}/bluez-customized:latest \
           -f ./deploy/bluez_customized/Dockerfile \
           --push
+
