@@ -22,12 +22,12 @@ jobs:
         registry: ghcr.io
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Build and push multi-platform Docker image
+    
+    - name: Build and push bluez_customized Docker image
       run: |
-        docker buildx build . \
+        docker buildx build ./dockerfiles/bluez_customized \
           --platform linux/amd64,linux/arm64 \
-          -t ghcr.io/${GITHUB_REPOSITORY,,}/briloner-mqtt-gateway:latest \
-          -f ./dockerfiles/meshgateway/Dockerfile \
-          --target production --push
+          -t ghcr.io/${GITHUB_REPOSITORY,,}/bluez-customized:latest \
+          -f ./dockerfiles/bluez_customized/Dockerfile \
+          --push
 
