@@ -18,6 +18,7 @@
         pkg-config \
         wget \
         curl \
+        ca-certificates \ 
         libbluetooth-dev \
         libdbus-1-dev \
         libudev-dev \
@@ -72,7 +73,7 @@
     COPY --from=builder /usr/local/lib /usr/local/lib
     COPY --from=builder /usr/local/include /usr/local/include
     COPY --from=builder /usr/local/etc /usr/local/etc
-    
+
     
     # Define the entrypoint or default command
     CMD ["/usr/local/libexec/bluetooth/bluetoothd", "--nodetach"]

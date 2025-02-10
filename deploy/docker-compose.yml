@@ -1,0 +1,53 @@
+services:
+  mqtt:
+    image: eclipse-mosquitto:latest
+    container_name: mqtt_broker
+    ports:
+      - "1883:1883"    
+    volumes:
+    - ./mosquitto_config/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    network_mode: host
+    restart: unless-stopped
+
+  home_assistant:
+    image: homeassistant/home-assistant:stable
+    container_name: home_assistant
+    ports:
+      - "8123:8123"   
+    volumes:
+      - ./home_assistant_config:/config 
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket 
+    privileged: true
+    network_mode: host    
+    restart: unless-stopped
+  bluez_customized:
+    image: ghcr.io/esbenzeuthen/telink_mesh-mqtt-gateway/bluez_customized:latest
+    container_name: bluez_customized
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket 
+  
+    security_opt:
+      - apparmor=unconfined
+    privileged: true
+    #stdin_open: true  # Keep stdin open for interactive terminal sessions
+    #tty: true     
+    user: root     
+    network_mode: host
+    restart: unless-stopped
+
+  briloner_mqtt_gateway:
+    image: ghcr.io/esbenzeuthen/telink_mesh-mqtt-gateway/briloner-mqtt-gateway:latest
+    container_name: briloner_mqtt_gateway
+    volumes:
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket           
+    stdin_open: true  # Keep stdin open for interactive terminal sessions
+    tty: true         # Enable TTY for interactive commands
+    privileged: true  # Enable privileged mode    
+    user: root    
+    devices:
+      - "/dev/hci0:/dev/hci0"  # Pass through Bluetooth device (hci0)
+    network_mode: host
+    environment:
+      - G_MESSAGES_DEBUG=all
+      - G_DEBUG=gc-friendly
+    restart: unless-stopped
