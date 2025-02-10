@@ -12,6 +12,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    steps:
     - name: Checkout repository
       uses: actions/checkout@v2
       with:
@@ -45,7 +46,7 @@ jobs:
         fi
 
     
-      - name: Build and push bluez_customized Docker image
+    - name: Build and push bluez_customized Docker image
       if: env.status == 'changed'
       run: |
         docker buildx build . \
