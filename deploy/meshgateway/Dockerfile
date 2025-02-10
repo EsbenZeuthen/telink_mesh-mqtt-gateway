@@ -1,7 +1,7 @@
 # ---------
 # Stage 1: Development Environment (No Forced Build)
 # ---------
-    FROM debian:bookworm AS dev
+    FROM debian:stable AS dev
 
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
@@ -64,7 +64,7 @@
     # ---------
     # Stage 3: Production (Minimal Runtime)
     # ---------
-    FROM debian:bookworm-slim AS production
+    FROM debian:stable-slim AS production
     
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
