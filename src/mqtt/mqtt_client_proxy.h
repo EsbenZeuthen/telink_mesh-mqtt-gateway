@@ -77,6 +77,7 @@ public:
             {
                 if (!sigMessageRx.emit(msg))
                 {
+                    g_warning("Could not handle consumed MQTT message, stopping MQTT consumption...");
                     mqttclient.stop_consuming();
                 };
             }
@@ -102,11 +103,13 @@ public:
     void connected(const std::string& cause) override {
         
         //source->trigger_event();  // Trigger the event directly in the custom source
+        g_message("Connected with MQTT broker. Cause: %s",cause.c_str());
     }
 
     void connection_lost(const std::string& cause) override {
         
       //  source->trigger_event();  // Trigger the event directly in the custom source
+      g_warning("Lost connection with MQTT broker. Cause: %s",cause.c_str());
     }
 
     void message_arrived(mqtt::const_message_ptr msg) override {
