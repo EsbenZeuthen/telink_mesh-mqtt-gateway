@@ -29,6 +29,8 @@
         libreadline-dev \
         python3-docutils \
         libjsoncpp-dev \
+        systemd \
+        udev \
         && apt-get clean \
         && rm -rf /var/lib/apt/lists/*
     
