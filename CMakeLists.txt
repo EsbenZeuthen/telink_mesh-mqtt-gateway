@@ -57,21 +57,6 @@ set_target_properties(meshgateway PROPERTIES
     VS_DEBUGGER_ENVIRONMENT "G_MESSAGES_DEBUG=all"
 )
 
-# Bluetooth PoC executable
-#add_executable(ble_poc
-#    src/ble_poc.cpp
-#    src/crypto/crypto.cpp
-#)
-
-# Link libraries for Bluetooth PoC
-#target_link_libraries(ble_poc
-#  ${GLIB2_LIBRARIES}
-#  ${GLIBMM_LIBRARIES}
-#  ${BLUETOOTH_LIBRARIES}
-#  ${GIO_LIBRARIES}
-#  crypto
-#)
-
 if(${BUILD_TESTS})
 
   # Enable testing

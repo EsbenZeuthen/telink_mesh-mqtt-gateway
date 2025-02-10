@@ -33,7 +33,7 @@ jobs:
         docker buildx build . \
           --platform linux/amd64,linux/arm64 \
           -t ghcr.io/${GITHUB_REPOSITORY,,}/briloner-mqtt-gateway:latest \
-          -f ./deploy/meshgateway/Dockerfile \
+          -f ./dockerfiles/meshgateway/Dockerfile \
           --target production --push
 
     - name: Check if bluez_customized Dockerfile changed
@@ -49,9 +49,9 @@ jobs:
     - name: Build and push bluez_customized Docker image
       if: env.status == 'changed'
       run: |
-        docker buildx build . \
+        docker buildx build ./dockerfiles/bluez_customized \
           --platform linux/amd64,linux/arm64 \
           -t ghcr.io/${GITHUB_REPOSITORY,,}/bluez-customized:latest \
-          -f ./deploy/bluez_customized/Dockerfile \
+          -f ./dockerfiles/bluez_customized/Dockerfile \
           --push
 
