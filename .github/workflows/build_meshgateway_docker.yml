@@ -1,4 +1,4 @@
-name: Cross-Build Docker Image
+name: Build briloner-mqtt-gateway
 
 on:
   workflow_dispatch:  # Manually triggered workflow
