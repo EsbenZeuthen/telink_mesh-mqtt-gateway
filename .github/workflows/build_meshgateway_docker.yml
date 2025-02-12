@@ -27,7 +27,7 @@ jobs:
       run: |
         docker buildx build . \
           --platform linux/amd64,linux/arm64 \
-          -t ghcr.io/${GITHUB_REPOSITORY,,}/briloner-mqtt-gateway:latest \
+          -t ghcr.io/${GITHUB_REPOSITORY,,}/telink_mesh-mqtt-gateway:latest \
           -f ./dockerfiles/meshgateway/Dockerfile \
           --target production --push
 

@@ -5,7 +5,13 @@
 #include "logging/log_handler.h"
 
 int main() {
-    g_log_set_writer_func(structured_log_writer, NULL, NULL);    
+    g_log_set_writer_func(structured_log_writer, NULL, NULL);
+    const char* mesh_name = std::getenv("MESH_NAME");
+    const char* mesh_password = std::getenv("MESH_PASSWORD");
+    const char* mesh_connected_name = std::getenv("MESH_CONNECTED_NAME");
+    const char* mqtt_broker_url = std::getenv("MQTT_BROKER_URL");
+    const char* mqtt_client_id = std::getenv("MQTT_CLIENT_ID");
+
     while(true)
     {
         try
@@ -16,17 +22,17 @@ int main() {
 
             BlueZProxy btproxy;
 
-            btproxy.disconnect_by_name("Telink tLight");
-            btproxy.disconnect_by_name("telink_mesh1");
+            btproxy.disconnect_by_name(mesh_connected_name);
+            btproxy.disconnect_by_name(mesh_name);
 
             auto mesh = std::make_shared<TelinkMesh>(
                             btproxy,
-                            "telink_mesh1",
-                            "123",
+                            mesh_name,
+                            mesh_password,
                             0x0211
                             );
             
-            auto mqtt_client = std::make_shared<MQTTClientProxy>("tcp://localhost:1883", "mqtt-client");
+            auto mqtt_client = std::make_shared<MQTTClientProxy>(mqtt_broker_url, mqtt_client_id);
 
             Gateway gateway(mesh,mqtt_client);
 

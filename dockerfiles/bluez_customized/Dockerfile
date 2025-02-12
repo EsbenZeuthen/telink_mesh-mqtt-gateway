@@ -1,6 +1,6 @@
 # ---- Stage 1: Build BlueZ ----
     FROM debian:stable AS builder
-
+    LABEL org.opencontainers.image.source="https://github.com/EsbenZeuthen/telink_mesh-mqtt-gateway"
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
     
@@ -41,14 +41,14 @@
         && cd bluez \
         && git checkout tags/5.79 \
         && git apply ../telink_notify_fix.patch \
-        && ./bootstrap \
-        && ./configure \
+        && ./bootstrap \        
+        && CFLAGS="-O0 -g" ./configure \
         && make \
         && make install
     
     # ---- Stage 2: Create a Minimal Production Image ----
     FROM debian:stable-slim
-    
+    LABEL org.opencontainers.image.source="https://github.com/EsbenZeuthen/telink_mesh-mqtt-gateway"
     # Set environment variables
     ENV DEBIAN_FRONTEND=noninteractive
     

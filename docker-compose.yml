@@ -24,8 +24,8 @@ services:
 
   bluez_customized:
     build:
-      context: ./deploy/bluez_customized
-      dockerfile: Dockerfile.prod
+      context: ./dockerfiles/bluez_customized
+      dockerfile: Dockerfile
     container_name: bluez_customized
     volumes:
       - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket 
@@ -44,7 +44,7 @@ services:
   briloner_mqtt_gateway_cpp_dev:
     build:
       context: .
-      dockerfile: ./deploy/meshgateway/Dockerfile  # Your Python dev container
+      dockerfile: ./dockerfiles/meshgateway/Dockerfile  # Your Python dev container
       target: dev
     container_name: briloner_mqtt_gateway_cpp_dev
     #networks:

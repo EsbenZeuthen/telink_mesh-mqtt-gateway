@@ -13,7 +13,7 @@ class Gateway
     public:
 
         Gateway(std::shared_ptr<TelinkMesh> mesh, std::shared_ptr<MQTTClientProxy> mqtt)
-            : mesh(mesh), mqtt(mqtt)
+            : mesh(mesh), mqtt(mqtt), mqtt_enabled(true)
         {
             mesh->setRxCallback(sigc::mem_fun(this,&Gateway::onMeshMessage));
             mqtt->setCallback(sigc::mem_fun(this,&Gateway::onMqttMessage));
@@ -125,6 +125,7 @@ class Gateway
                 mesh->onReady([callback,this]() {
                     if (callback())
                     {
+                        g_message("Mesh became ready - starting MQTT consumption...");
                         // enable mqtt
                         mqtt_enabled = true;
                         //start consuming
@@ -188,6 +189,8 @@ class Gateway
                     for (auto packet : packets)
                     {               
                         mesh->send(packet);
+
+                        mqtt_enabled = true;
                     }                    
                 } catch (const std::exception& e)                
                 {

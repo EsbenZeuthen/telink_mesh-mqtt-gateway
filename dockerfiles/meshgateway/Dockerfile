@@ -4,10 +4,16 @@
     FROM debian:stable AS dev
 
     # Set environment variables
-    ENV DEBIAN_FRONTEND=noninteractive
+    ENV DEBIAN_FRONTEND=noninteractive \
+        MESH_NAME=telink_mesh1 \
+        MESH_PASSWORD=123 \
+        MESH_CONNECTED_NAME="Telink tLight" \
+        MQTT_BROKER_URL=tcp://localhost:1883 \
+        MQTT_CLIENT_ID=telink_mesh_gateway
     
     # Install all development dependencies
-    RUN apt-get update && apt-get install -y \
+    RUN groupadd -r _ssh || true
+    RUN apt-get update && apt-get install -y --fix-missing\
         build-essential \
         libgtest-dev \
         cmake \
@@ -65,11 +71,18 @@
     # Stage 3: Production (Minimal Runtime)
     # ---------
     FROM debian:stable-slim AS production
-    
+    LABEL org.opencontainers.image.source="https://github.com/EsbenZeuthen/telink_mesh-mqtt-gateway"
+
     # Set environment variables
-    ENV DEBIAN_FRONTEND=noninteractive
     
-    # Install only runtime dependencies
+    ENV DEBIAN_FRONTEND=noninteractive \
+        MESH_NAME=telink_mesh1 \
+        MESH_PASSWORD=123 \
+        MESH_CONNECTED_NAME="Telink tLight" \
+        MQTT_BROKER_URL=tcp://localhost:1883 \
+        MQTT_CLIENT_ID=telink_mesh_gateway
+    
+        # Install only runtime dependencies
     RUN apt-get update && apt-get install -y --no-install-recommends\
         #libbluetooth3\
        # libdbus-1-3 \
