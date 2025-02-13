@@ -6,7 +6,7 @@ BASE_URL="https://raw.githubusercontent.com/EsbenZeuthen/telink_mesh-mqtt-gatewa
 # List of files to download
 FILES=(
     "mosquitto/mosquitto.conf"
-    # Add more files here if there are more in the deploy folder
+    "docker-compose.yml"
 )
 
 # Download each file from the repository
