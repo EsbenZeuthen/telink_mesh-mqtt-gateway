@@ -39,13 +39,7 @@ services:
     image: ghcr.io/esbenzeuthen/telink_mesh-mqtt-gateway/telink_mesh-mqtt-gateway:latest
     container_name: briloner_mqtt_gateway
     volumes:
-      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket           
-    environment:
-    #  - MESH_NAME=telink_mesh1
-    #  - MESH_PASSWORD=123
-    #  - MESH_CONNECTED_NAME="Telink tLight"
-    #  - MQTT_BROKER_URL=tcp://localhost:1883
-    #  - MQTT_CLIENT_ID=telink_mesh_gateway
+      - /run/dbus/system_bus_socket:/run/dbus/system_bus_socket:ro  # Expose the host's D-Bus socket                  
     stdin_open: true  # Keep stdin open for interactive terminal sessions
     tty: true         # Enable TTY for interactive commands
     privileged: true  # Enable privileged mode    
@@ -56,4 +50,9 @@ services:
     environment:
       - G_MESSAGES_DEBUG=all
       - G_DEBUG=gc-friendly
+    #  - MESH_NAME=telink_mesh1
+    #  - MESH_PASSWORD=123
+    #  - MESH_CONNECTED_NAME="Telink tLight"
+    #  - MQTT_BROKER_URL=tcp://localhost:1883
+    #  - MQTT_CLIENT_ID=telink_mesh_gateway
     restart: unless-stopped
